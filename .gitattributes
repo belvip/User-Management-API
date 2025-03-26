@@ -1,2 +1,16 @@
 /mvnw text eol=lf
 *.cmd text eol=crlf
+
+# Normalize line endings for all text files
+* text=auto
+
+# Ensure specific files always have LF line endings
+*.java    text eol=lf
+*.xml     text eol=lf
+*.properties text eol=lf
+*.yml     text eol=lf
+
+# Ensure batch files use CRLF (Windows style)
+*.bat     text eol=crlf
+*.cmd     text eol=crlf
+
