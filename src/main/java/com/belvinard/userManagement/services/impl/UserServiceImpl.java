@@ -7,7 +7,6 @@ import com.belvinard.userManagement.model.User;
 import com.belvinard.userManagement.repositories.RoleRepository;
 import com.belvinard.userManagement.repositories.UserRepository;
 import com.belvinard.userManagement.services.UserService;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
