@@ -12,6 +12,11 @@ import com.belvinard.userManagement.security.response.LoginResponse;
 import com.belvinard.userManagement.security.response.MessageResponse;
 import com.belvinard.userManagement.security.response.UserInfoResponse;
 import com.belvinard.userManagement.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +53,11 @@ public class AuthController {
 
 
 
-    public AuthController(JwtUtils jwtUtils, AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, UserService userService) {
+    public AuthController(JwtUtils jwtUtils, AuthenticationManager authenticationManager,
+                          UserRepository userRepository,
+                          RoleRepository roleRepository,
+                          PasswordEncoder encoder,
+                          UserService userService) {
         this.jwtUtils = jwtUtils;
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
@@ -57,6 +66,39 @@ public class AuthController {
         this.userService = userService;
     }
 
+    @Operation(
+            summary = "Authenticate user",
+            description = "Authenticates user credentials and returns JWT token",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "{\"username\": \"user1\", \"password\": \"password1\"}"
+                            )
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Authentication successful",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = LoginResponse.class),
+                                    examples = @ExampleObject(
+                                            value = "{\"username\": \"user1\", \"roles\": [\"ROLE_USER\"], \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"}"
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Bad request - invalid input format"
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized - invalid credentials"
+                    )
+            }
+    )
     @PostMapping("/public/signin")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
         Authentication authentication;
@@ -89,6 +131,42 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+            summary = "Register new user",
+            description = "Creates a new user account with the provided details",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "{\"username\": \"newuser\", \"email\": \"new@example.com\", \"password\": \"password123\", \"role\": [\"user\"]}"
+                            )
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "User registered successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = MessageResponse.class),
+                                    examples = @ExampleObject(
+                                            value = "{\"message\": \"User registered successfully!\"}"
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Bad request - username/email already exists or invalid input",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = MessageResponse.class),
+                                    examples = @ExampleObject(
+                                            value = "{\"message\": \"Error: Username is already taken!\"}"
+                                    )
+                            )
+                    )
+            }
+    )
     @PostMapping("/public/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         if (userRepository.existsByUserName(signUpRequest.getUsername())) {
