@@ -11,6 +11,7 @@ import com.belvinard.userManagement.security.request.SignupRequest;
 import com.belvinard.userManagement.security.response.LoginResponse;
 import com.belvinard.userManagement.security.response.MessageResponse;
 import com.belvinard.userManagement.security.response.UserInfoResponse;
+import com.belvinard.userManagement.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,13 +44,17 @@ public class AuthController {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
+    private final UserService userService;
 
-    public AuthController(JwtUtils jwtUtils, AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder) {
+
+
+    public AuthController(JwtUtils jwtUtils, AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder, UserService userService) {
         this.jwtUtils = jwtUtils;
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.encoder = encoder;
+        this.userService = userService;
     }
 
     @PostMapping("/public/signin")
@@ -130,7 +135,7 @@ public class AuthController {
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 
-    /*@GetMapping("/user")
+    @GetMapping("/user")
     public ResponseEntity<?> getUserDetails(@AuthenticationPrincipal UserDetails userDetails) {
         User user = userService.findByUsername(userDetails.getUsername());
 
@@ -153,7 +158,13 @@ public class AuthController {
         );
 
         return ResponseEntity.ok().body(response);
-    }*/
+    }
+
+    @GetMapping("/username")
+    public String currentUserName(@AuthenticationPrincipal UserDetails userDetails) {
+        return (userDetails != null) ? userDetails.getUsername() : "";
+    }
+
 
 
 
