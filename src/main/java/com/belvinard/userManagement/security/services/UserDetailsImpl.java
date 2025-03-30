@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-
 import com.belvinard.userManagement.model.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;

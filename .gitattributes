@@ -14,3 +14,18 @@
 *.bat     text eol=crlf
 *.cmd     text eol=crlf
 
+# Set default behavior for text files
+* text=auto
+
+# Ensure specific text files use LF line endings
+*.js text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.md text eol=lf
+
+# Ensure binary files are not modified
+*.png binary
+*.jpg binary
+*.gif binary
+
+

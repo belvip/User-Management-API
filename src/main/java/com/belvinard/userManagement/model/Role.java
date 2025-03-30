@@ -1,7 +1,5 @@
 package com.belvinard.userManagement.model;
 
-
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
