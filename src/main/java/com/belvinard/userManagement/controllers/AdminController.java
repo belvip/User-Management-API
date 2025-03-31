@@ -3,6 +3,7 @@ package com.belvinard.userManagement.controllers;
 
 import com.belvinard.userManagement.dtos.Response;
 import com.belvinard.userManagement.dtos.UserDTO;
+import com.belvinard.userManagement.dtos.UserResponse;
 import com.belvinard.userManagement.dtos.UserRoleDTO;
 import com.belvinard.userManagement.exceptions.ResourceNotFoundException;
 import com.belvinard.userManagement.model.Role;
@@ -40,9 +41,10 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Récupérer tous les utilisateurs",
             description = "Retourne la liste de tous les utilisateurs enregistrés.")
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
+    public ResponseEntity<UserResponse> getAllUsers() {
+        UserResponse userResponse = userService.getAllUsers();
+        //return ResponseEntity.ok(users);
+        return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
 
     @Operation(summary = "Met à jour un utilisateur",
