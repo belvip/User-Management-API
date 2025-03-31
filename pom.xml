@@ -28,9 +28,11 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
-		<springdoc.version>2.5.0</springdoc.version>
+		<springdoc.version>2.5.0</springdoc.version> <!-- Mets à jour à la dernière version stable -->
 	</properties>
+
 	<dependencies>
+		<!-- Spring Boot dependencies -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
@@ -40,6 +42,7 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
+		<!-- Spring Boot Test dependencies -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -51,27 +54,33 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- PostgreSQL database -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- Spring Data JPA -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
+
+		<!-- Lombok for code reduction -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
 
+		<!-- Validation dependency -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 
+		<!-- JWT dependencies -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
@@ -90,18 +99,24 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Documentation API -->
+		<!-- OpenAPI documentation dependencies -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<!--<version>${springdoc.version}</version>-->
-			<version>2.3.0</version>
+			<version>2.5.0</version> <!-- Assure-toi d'avoir la version correcte -->
 		</dependency>
 
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-ui</artifactId>
-			<version>1.7.0</version>
+			<version>1.7.0</version> <!-- Mettre à jour à la version la plus récente -->
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.modelmapper/modelmapper -->
+		<dependency>
+			<groupId>org.modelmapper</groupId>
+			<artifactId>modelmapper</artifactId>
+			<version>3.2.2</version>
 		</dependency>
 
 	</dependencies>

@@ -1,6 +1,6 @@
 package com.belvinard.userManagement.services;
 
-import com.belvinard.userManagement.dtos.UserRoleDTO;
+import com.belvinard.userManagement.dtos.UserDTO;
 import com.belvinard.userManagement.model.User;
 
 import java.util.List;
@@ -12,7 +12,7 @@ public interface UserService {
 
     void deleteUser(Long userId);
 
-    User getUserById(Long userId);
+    UserDTO getUserById(Long userId);
 
 
 }

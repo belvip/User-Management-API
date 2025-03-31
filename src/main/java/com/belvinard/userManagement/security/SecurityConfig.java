@@ -60,29 +60,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-//    @Bean
-//    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-//        http.authorizeHttpRequests((requests)
-//                -> requests
-//                // Public endpoints
-//                .requestMatchers(
-//                        "/api/auth/public/**",
-//                        "/api/csrf-token",
-//                        "/swagger-ui/**",
-//                        "/v3/api-docs/**",
-//                        "/swagger-resources/**",
-//                        "/webjars/**"
-//                ).permitAll()
-//                .requestMatchers("/api/public/**").permitAll()
 //
-//                .anyRequest().authenticated());
-//
-//        http.csrf(AbstractHttpConfigurer::disable);
-//        //http.formLogin(withDefaults());
-//        http.httpBasic(withDefaults());
-//        return http.build();
-//    }
-
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
             throws Exception {
