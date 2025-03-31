@@ -1,5 +1,6 @@
 package com.belvinard.userManagement.services.impl;
 
+import com.belvinard.userManagement.dtos.UserRoleDTO;
 import com.belvinard.userManagement.model.User;
 
 import com.belvinard.userManagement.repositories.UserRepository;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +52,21 @@ public class UserServiceImpl implements UserService {
         userRepository.delete(user);
     }
 
+    @Override
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Utilisateur non trouvé avec l'ID: " + userId));
+    }
+
+//    @Override
+//    public List<UserRoleDTO> getAllUserRoles() {
+//        List<User> users = userRepository.findAll();
+//        return users.stream()
+//                .map(user -> new UserRoleDTO(user.getUserName(),
+//                        user.getRole().getRoleName().name()))
+//                .collect(Collectors.toList());
+//    }
 
 
 
