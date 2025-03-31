@@ -69,23 +69,39 @@ public class AdminController {
         return ResponseEntity.ok(updatedUser);
     }
 
+//    @Operation(summary = "Supprime un utilisateur",
+//            description = "Supprime un utilisateur par son ID.")
+//    @DeleteMapping("/user/{userId}")
+//    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
+//        userService.deleteUser(userId);
+//        return ResponseEntity.ok("Utilisateur supprimé avec succès.");
+//    }
+
     @Operation(summary = "Supprime un utilisateur",
             description = "Supprime un utilisateur par son ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Utilisateur supprimé avec succès"),
+            @ApiResponse(responseCode = "404", description = "Utilisateur non trouvé",
+                    content = @Content(schema = @Schema(implementation = Response.class)))
+    })
     @DeleteMapping("/user/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
-        userService.deleteUser(userId);
-        return ResponseEntity.ok("Utilisateur supprimé avec succès.");
+        // Supprimer l'utilisateur dans le service
+        UserDTO deletedUserDTO = userService.deleteUser(userId);
+
+        // Retourner le UserDTO comme réponse après suppression
+        return ResponseEntity.ok(deletedUserDTO);
     }
 
-//    @Operation(summary = "Récupérer un utilisateur",
-//            description = "Récupère les détails d'un utilisateur par son ID.")
-//    @GetMapping("/user/{userId}")
-//    public ResponseEntity<User> getUserById(@PathVariable Long userId) {
-//        User user = userService.getUserById(userId);
-//        return ResponseEntity.ok(user);
-//    }
-        @Operation(summary = "Récupérer un utilisateur",
+
+    @Operation(summary = "Récupérer un utilisateur",
                 description = "Récupère les détails d'un utilisateur par son ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Utilisateur trouvé"),
+            @ApiResponse(responseCode = "404", description = "Utilisateur non trouvé",
+                    content = @Content(schema = @Schema(implementation = Response.class))),
+            @ApiResponse(responseCode = "403", description = "Accès refusé")
+    })
         @GetMapping("/user/{userId}")
         public ResponseEntity<UserDTO> getUserById(@PathVariable Long userId) {
             UserDTO userDTO = userService.getUserById(userId);
