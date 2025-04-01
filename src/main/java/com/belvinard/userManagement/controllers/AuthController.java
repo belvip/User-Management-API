@@ -1,6 +1,9 @@
 package com.belvinard.userManagement.controllers;
 
+import com.belvinard.userManagement.dtos.Response;
 import com.belvinard.userManagement.dtos.SignupRequest;
+import com.belvinard.userManagement.exceptions.APIException;
+import com.belvinard.userManagement.exceptions.ResourceNotFoundException;
 import com.belvinard.userManagement.model.User;
 import com.belvinard.userManagement.repositories.UserRepository;
 import com.belvinard.userManagement.security.jwt.JwtUtils;
@@ -16,6 +19,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -51,6 +55,8 @@ public class AuthController {
         return ResponseEntity.ok("Utilisateur créé avec succès : " + user.getUserName());
     }
 
+
+
     @Operation(summary = "Connexion utilisateur", description = "Authentifie un utilisateur et renvoie un token JWT.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Connexion réussie"),
@@ -75,6 +81,16 @@ public class AuthController {
                 user.getEmail(),
                 user.getRole().getRoleName().name()
         ));
+    }
+
+    // Gestion de l'exception ResourceNotFoundException
+    @ExceptionHandler(APIException.class)
+    public ResponseEntity<Response> myAPIException(APIException ex) {
+        // Créer l'instance d'ErrorResponse
+        Response errorResponse = new Response("BAD_REQUEST", ex.getMessage());
+
+        // Retourner la réponse avec le code HTTP 404
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     @Operation(summary = "Récupérer les détails de l'utilisateur connecté", security = @SecurityRequirement(name = "BearerAuth"))

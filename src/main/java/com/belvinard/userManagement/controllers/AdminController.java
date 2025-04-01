@@ -5,6 +5,7 @@ import com.belvinard.userManagement.dtos.Response;
 import com.belvinard.userManagement.dtos.UserDTO;
 import com.belvinard.userManagement.dtos.UserResponse;
 import com.belvinard.userManagement.dtos.UserRoleDTO;
+import com.belvinard.userManagement.exceptions.APIException;
 import com.belvinard.userManagement.exceptions.ResourceNotFoundException;
 import com.belvinard.userManagement.model.Role;
 import com.belvinard.userManagement.model.User;
@@ -27,6 +28,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -61,11 +63,11 @@ public class AdminController {
             userToUpdate.setPassword(request.getPassword()); // Le hash sera fait dans le service
         }
 
-        if (request.getRoleId() != null) {
-            Role role = roleRepository.findById(request.getRoleId())
-                    .orElseThrow(() -> new EntityNotFoundException("Rôle non trouvé avec l'ID: " + request.getRoleId()));
-            userToUpdate.setRole(role);
-        }
+//        if (request.getRoleId() != null) {
+//            Role role = roleRepository.findById(request.getRoleId())
+//                    .orElseThrow(() -> new EntityNotFoundException("Rôle non trouvé avec l'ID: " + request.getRoleId()));
+//            userToUpdate.setRole(role);
+//        }
 
         User updatedUser = userService.updateUser(userId, userToUpdate);
         return ResponseEntity.ok(updatedUser);
@@ -128,6 +130,35 @@ public class AdminController {
         List<UserRoleDTO> userRoles = roleService.getAllUserRoles();
         return ResponseEntity.ok(userRoles);
     }
+
+    @Operation(summary = "Mettre à jour le rôle d'un utilisateur",
+            description = "Permet à un administrateur de modifier le rôle d'un utilisateur.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Rôle mis à jour avec succès",
+                    content = @Content(schema = @Schema(implementation = UserDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Requête invalide"),
+            @ApiResponse(responseCode = "404", description = "Utilisateur ou rôle non trouvé"),
+            @ApiResponse(responseCode = "403", description = "Accès refusé")
+    })
+    @PutMapping("/user/{userId}/role")
+    public ResponseEntity<UserDTO> updateUserRole(@PathVariable Long userId, @RequestBody Map<String, String> request) {
+        String roleName = request.get("roleName"); // Récupère bien la valeur
+        UserDTO updatedUser = userService.updateUserRole(userId, roleName);
+        return ResponseEntity.ok(updatedUser);
+    }
+
+
+    // Gestion de l'exception ResourceNotFoundException
+    @ExceptionHandler(APIException.class)
+    public ResponseEntity<Response> myAPIException(APIException ex) {
+        // Créer l'instance d'ErrorResponse
+        Response errorResponse = new Response("BAD_REQUEST", ex.getMessage());
+
+        // Retourner la réponse avec le code HTTP 404
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+
 
 
 }

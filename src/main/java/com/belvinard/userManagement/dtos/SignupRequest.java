@@ -24,6 +24,6 @@ public class SignupRequest {
     @Size(min = 6, max = 40)
     private String password;
 
-    @NotBlank
-    private String role; // "user" ou "admin"
+//    @NotBlank
+//    private String role; // "user" ou "admin"
 }
