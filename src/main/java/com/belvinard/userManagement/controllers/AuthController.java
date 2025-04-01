@@ -2,6 +2,7 @@ package com.belvinard.userManagement.controllers;
 
 import com.belvinard.userManagement.dtos.Response;
 import com.belvinard.userManagement.dtos.SignupRequest;
+import com.belvinard.userManagement.dtos.ValidationErrorResponse;
 import com.belvinard.userManagement.exceptions.APIException;
 import com.belvinard.userManagement.exceptions.ResourceNotFoundException;
 import com.belvinard.userManagement.model.User;
@@ -26,7 +27,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/public")
@@ -91,6 +97,20 @@ public class AuthController {
 
         // Retourner la réponse avec le code HTTP 404
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    // ✅ Gérer l'exception directement dans le contrôleur
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ValidationErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        List<String> errors = ex.getBindingResult()
+                .getAllErrors()
+                .stream()
+                .map(error -> ((FieldError) error).getField() + " : "
+                        + error.getDefaultMessage())
+                .collect(Collectors.toList());
+
+        ValidationErrorResponse response = new ValidationErrorResponse("VALIDATION_ERROR", errors);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @Operation(summary = "Récupérer les détails de l'utilisateur connecté", security = @SecurityRequirement(name = "BearerAuth"))
