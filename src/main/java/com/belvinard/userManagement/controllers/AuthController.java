@@ -1,16 +1,11 @@
 package com.belvinard.userManagement.controllers;
 
-import com.belvinard.userManagement.dtos.Response;
-import com.belvinard.userManagement.dtos.SignupRequest;
-import com.belvinard.userManagement.dtos.UserDTO;
-import com.belvinard.userManagement.dtos.ValidationErrorResponse;
+import com.belvinard.userManagement.dtos.*;
 import com.belvinard.userManagement.exceptions.APIException;
-import com.belvinard.userManagement.exceptions.ResourceNotFoundException;
 import com.belvinard.userManagement.model.User;
 import com.belvinard.userManagement.repositories.UserRepository;
 import com.belvinard.userManagement.security.jwt.JwtUtils;
 import com.belvinard.userManagement.security.request.LoginRequest;
-import com.belvinard.userManagement.security.request.UpdateUserRequest;
 import com.belvinard.userManagement.security.response.JwtResponse;
 import com.belvinard.userManagement.security.services.UserDetailsImpl;
 import com.belvinard.userManagement.services.AuthService;
@@ -101,6 +96,47 @@ public class AuthController {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @Operation(summary = "Récupérer les détails de l'utilisateur connecté", security = @SecurityRequirement(name = "BearerAuth"))
+    @GetMapping("/user")
+    public ResponseEntity<?> getUserDetails(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body("Utilisateur non authentifié");
+        }
+        return ResponseEntity.ok(userDetails);
+    }
+
+//    @Operation(summary = "Met à jour un utilisateur",
+//          description = "Modifie les informations d'un utilisateur existant sans modifier son rôle.")
+//    @PutMapping("/update-user/{userId}")
+//    public ResponseEntity<UserDTO> updateUser(
+//            @PathVariable Long userId,
+//            @Valid @RequestBody UpdateUserRequest request) {  // Valide directement la Request
+//
+//        UserDTO updatedUser = authService.updateUser(userId, request); // Passe la request directement
+//        return ResponseEntity.ok(updatedUser);
+//    }
+
+
+    @Operation(
+            summary = "Met à jour un utilisateur",
+            description = "Modifie les informations d'un utilisateur existant sans modifier son rôle."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Utilisateur mis à jour avec succès"),
+            @ApiResponse(responseCode = "400", description = "Requête invalide ou données de mise à jour incorrectes"),
+            @ApiResponse(responseCode = "404", description = "Utilisateur non trouvé"),
+            @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
+    })
+    @PutMapping("/update-user/{userId}")
+    public ResponseEntity<UserDTO> updateUser(
+            @PathVariable Long userId,
+            @Valid @RequestBody UpdateUserRequest request) {
+
+        UserDTO updatedUser = authService.updateUser(userId, request);
+        return ResponseEntity.ok(updatedUser);
+    }
+
+
     // ✅ Gérer l'exception directement dans le contrôleur
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
@@ -115,51 +151,5 @@ public class AuthController {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    @Operation(summary = "Récupérer les détails de l'utilisateur connecté", security = @SecurityRequirement(name = "BearerAuth"))
-    @GetMapping("/user")
-    public ResponseEntity<?> getUserDetails(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        if (userDetails == null) {
-            return ResponseEntity.status(401).body("Utilisateur non authentifié");
-        }
-        return ResponseEntity.ok(userDetails);
-    }
-
-
-//    @Operation(summary = "Met à jour un utilisateur",
-//            description = "Modifie les informations d'un utilisateur existant.")
-//    @PutMapping("/update-user/{userId}")
-//    public ResponseEntity<?> updateUser(
-//            @PathVariable Long userId,
-//            @Valid @RequestBody UpdateUserRequest request) {
-//
-//        User userToUpdate = new User();
-//        userToUpdate.setUserName(request.getUserName());
-//        userToUpdate.setEmail(request.getEmail());
-//        if (request.getPassword() != null) {
-//            userToUpdate.setPassword(request.getPassword()); // Le hash sera fait dans le service
-//        }
-//
-//        User updatedUser = authService.updateUser(userId, userToUpdate);
-//        return ResponseEntity.ok(updatedUser);
-//    }
-
-    @Operation(summary = "Met à jour un utilisateur",
-            description = "Modifie les informations d'un utilisateur existant sans modifier son rôle.")
-    @PutMapping("/update-user/{userId}")
-    public ResponseEntity<UserDTO> updateUser(
-            @PathVariable Long userId,
-            @Valid @RequestBody UpdateUserRequest request) {
-
-        // Création d'un UserDTO pour transmettre les données
-        UserDTO userToUpdate = new UserDTO();
-        userToUpdate.setUserName(request.getUserName());
-        userToUpdate.setEmail(request.getEmail());
-        userToUpdate.setPassword(request.getPassword()); // Le hash est géré dans le service
-
-        // Appel du service avec le DTO
-        UserDTO updatedUser = authService.updateUser(userId, userToUpdate);
-
-        return ResponseEntity.ok(updatedUser);
-    }
 
 }
