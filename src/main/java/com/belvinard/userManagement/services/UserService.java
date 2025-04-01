@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface UserService {
     UserResponse getAllUsers();
 
-    User updateUser(Long userId, User userToUpdate);
+//    User updateUser(Long userId, User userToUpdate);
 
     UserDTO deleteUser(Long userId);
 

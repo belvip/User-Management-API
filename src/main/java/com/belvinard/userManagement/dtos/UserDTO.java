@@ -1,5 +1,10 @@
 package com.belvinard.userManagement.dtos;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Column;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,7 +14,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserDTO {
     private Long userId;
+
+    @NotBlank
+    @Size(max = 20)
     private String userName;
+    @NotBlank
+    @Size(max = 50)
+    @Email
     private String email;
+
+    @Size(max = 120)
+    @Column(name = "password")
+    @JsonIgnore
+    private String password;
+
     private String roleName;
+
 }

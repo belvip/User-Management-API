@@ -12,7 +12,6 @@ import com.belvinard.userManagement.model.User;
 import com.belvinard.userManagement.repositories.RoleRepository;
 import com.belvinard.userManagement.repositories.UserRepository;
 import com.belvinard.userManagement.services.UserService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -50,26 +49,23 @@ public class UserServiceImpl implements UserService {
         //return userRepository.findAll();
     }
 
-    @Override
-    public User updateUser(Long userId, User updatedUser) {
-        return userRepository.findById(userId)
-                .map(user -> {
-                    if (updatedUser.getUserName() != null) {
-                        user.setUserName(updatedUser.getUserName());
-                    }
-                    if (updatedUser.getEmail() != null) {
-                        user.setEmail(updatedUser.getEmail());
-                    }
-                    if (updatedUser.getPassword() != null) {
-                        user.setPassword(updatedUser.getPassword()); // Il faudra hasher le mot de passe
-                    }
-                    if (updatedUser.getRole() != null) {
-                        user.setRole(updatedUser.getRole());
-                    }
-                    return userRepository.save(user);
-                })
-                .orElseThrow(() -> new EntityNotFoundException("Utilisateur non trouvé avec l'ID: " + userId));
-    }
+//    @Override
+//    public User updateUser(Long userId, User updatedUser) {
+//        return userRepository.findById(userId)
+//                .map(user -> {
+//                    if (updatedUser.getUserName() != null) {
+//                        user.setUserName(updatedUser.getUserName());
+//                    }
+//                    if (updatedUser.getEmail() != null) {
+//                        user.setEmail(updatedUser.getEmail());
+//                    }
+//                    if (updatedUser.getPassword() != null) {
+//                        user.setPassword(updatedUser.getPassword()); // Il faudra hasher le mot de passe
+//                    }
+//                    return userRepository.save(user);
+//                })
+//                .orElseThrow(() -> new EntityNotFoundException("Utilisateur non trouvé avec l'ID: " + userId));
+//    }
 
     @Override
     public UserDTO deleteUser(Long userId) {

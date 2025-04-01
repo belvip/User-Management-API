@@ -2,6 +2,7 @@ package com.belvinard.userManagement.controllers;
 
 import com.belvinard.userManagement.dtos.Response;
 import com.belvinard.userManagement.dtos.SignupRequest;
+import com.belvinard.userManagement.dtos.UserDTO;
 import com.belvinard.userManagement.dtos.ValidationErrorResponse;
 import com.belvinard.userManagement.exceptions.APIException;
 import com.belvinard.userManagement.exceptions.ResourceNotFoundException;
@@ -9,6 +10,7 @@ import com.belvinard.userManagement.model.User;
 import com.belvinard.userManagement.repositories.UserRepository;
 import com.belvinard.userManagement.security.jwt.JwtUtils;
 import com.belvinard.userManagement.security.request.LoginRequest;
+import com.belvinard.userManagement.security.request.UpdateUserRequest;
 import com.belvinard.userManagement.security.response.JwtResponse;
 import com.belvinard.userManagement.security.services.UserDetailsImpl;
 import com.belvinard.userManagement.services.AuthService;
@@ -121,4 +123,43 @@ public class AuthController {
         }
         return ResponseEntity.ok(userDetails);
     }
+
+
+//    @Operation(summary = "Met à jour un utilisateur",
+//            description = "Modifie les informations d'un utilisateur existant.")
+//    @PutMapping("/update-user/{userId}")
+//    public ResponseEntity<?> updateUser(
+//            @PathVariable Long userId,
+//            @Valid @RequestBody UpdateUserRequest request) {
+//
+//        User userToUpdate = new User();
+//        userToUpdate.setUserName(request.getUserName());
+//        userToUpdate.setEmail(request.getEmail());
+//        if (request.getPassword() != null) {
+//            userToUpdate.setPassword(request.getPassword()); // Le hash sera fait dans le service
+//        }
+//
+//        User updatedUser = authService.updateUser(userId, userToUpdate);
+//        return ResponseEntity.ok(updatedUser);
+//    }
+
+    @Operation(summary = "Met à jour un utilisateur",
+            description = "Modifie les informations d'un utilisateur existant sans modifier son rôle.")
+    @PutMapping("/update-user/{userId}")
+    public ResponseEntity<UserDTO> updateUser(
+            @PathVariable Long userId,
+            @Valid @RequestBody UpdateUserRequest request) {
+
+        // Création d'un UserDTO pour transmettre les données
+        UserDTO userToUpdate = new UserDTO();
+        userToUpdate.setUserName(request.getUserName());
+        userToUpdate.setEmail(request.getEmail());
+        userToUpdate.setPassword(request.getPassword()); // Le hash est géré dans le service
+
+        // Appel du service avec le DTO
+        UserDTO updatedUser = authService.updateUser(userId, userToUpdate);
+
+        return ResponseEntity.ok(updatedUser);
+    }
+
 }

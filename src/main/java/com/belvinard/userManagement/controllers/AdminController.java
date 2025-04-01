@@ -49,36 +49,22 @@ public class AdminController {
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
 
-    @Operation(summary = "Met à jour un utilisateur",
-            description = "Modifie les informations d'un utilisateur existant.")
-    @PutMapping("/update-user/{userId}")
-    public ResponseEntity<?> updateUser(
-            @PathVariable Long userId,
-            @Valid @RequestBody UpdateUserRequest request) {
-
-        User userToUpdate = new User();
-        userToUpdate.setUserName(request.getUserName());
-        userToUpdate.setEmail(request.getEmail());
-        if (request.getPassword() != null) {
-            userToUpdate.setPassword(request.getPassword()); // Le hash sera fait dans le service
-        }
-
-//        if (request.getRoleId() != null) {
-//            Role role = roleRepository.findById(request.getRoleId())
-//                    .orElseThrow(() -> new EntityNotFoundException("Rôle non trouvé avec l'ID: " + request.getRoleId()));
-//            userToUpdate.setRole(role);
+//    @Operation(summary = "Met à jour un utilisateur",
+//            description = "Modifie les informations d'un utilisateur existant.")
+//    @PutMapping("/update-user/{userId}")
+//    public ResponseEntity<?> updateUser(
+//            @PathVariable Long userId,
+//            @Valid @RequestBody UpdateUserRequest request) {
+//
+//        User userToUpdate = new User();
+//        userToUpdate.setUserName(request.getUserName());
+//        userToUpdate.setEmail(request.getEmail());
+//        if (request.getPassword() != null) {
+//            userToUpdate.setPassword(request.getPassword()); // Le hash sera fait dans le service
 //        }
-
-        User updatedUser = userService.updateUser(userId, userToUpdate);
-        return ResponseEntity.ok(updatedUser);
-    }
-
-//    @Operation(summary = "Supprime un utilisateur",
-//            description = "Supprime un utilisateur par son ID.")
-//    @DeleteMapping("/user/{userId}")
-//    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
-//        userService.deleteUser(userId);
-//        return ResponseEntity.ok("Utilisateur supprimé avec succès.");
+//
+//        User updatedUser = userService.updateUser(userId, userToUpdate);
+//        return ResponseEntity.ok(updatedUser);
 //    }
 
     @Operation(summary = "Supprime un utilisateur",
