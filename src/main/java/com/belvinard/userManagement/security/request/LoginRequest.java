@@ -18,7 +18,7 @@ public class LoginRequest {
     @Email(message = "Doit être une adresse email valide")
     @Schema(
             description = "Adresse email valide",
-            example = "john.doe@example.com",
+            example = "admin@example.com",
             maxLength = 50,
             requiredMode = Schema.RequiredMode.REQUIRED
     )

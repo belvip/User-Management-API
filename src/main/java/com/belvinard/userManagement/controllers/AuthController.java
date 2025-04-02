@@ -55,7 +55,14 @@ public class AuthController {
 
     @Operation(
             summary = "Inscription d'un nouvel utilisateur",
-            description = "Crée un nouveau compte utilisateur avec le rôle USER par défaut. Les mots de passe doivent contenir au moins 6 caractères avec une majuscule, un chiffre et un caractère spécial.",
+            description = """
+            Permet de créer un nouveau compte utilisateur avec le rôle `USER` par défaut. 
+            Les mots de passe doivent respecter les critères suivants :
+            - Minimum de 6 caractères
+            - Doit contenir au moins une majuscule
+            - Doit contenir au moins un chiffre
+            - Doit contenir un caractère spécial
+        """,
             tags = {"Authentification"}
     )
     @ApiResponses({
@@ -67,45 +74,48 @@ public class AuthController {
                             schema = @Schema(implementation = UserDTO.class),
                             examples = @ExampleObject(
                                     value = """
-            {
-                "userId": 1,
-                "username": "john_doe",
-                "email": "john@example.com",
-                "role": "USER"
-            }"""
+                                    {
+                                        "userId": 1,
+                                        "username": "admin",
+                                        "email": "admin@example.com",
+                                        "role": "USER"
+                                    }
+                                """
                             )
                     )
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "Données invalides",
+                    description = "Données invalides - Par exemple, email mal formaté ou mot de passe non conforme",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ValidationErrorResponse.class),
                             examples = @ExampleObject(
                                     value = """
-            {
-                "code": "VALIDATION_ERROR",
-                "errors": [
-                    "email : Doit être une adresse email valide",
-                    "password : Le mot de passe doit contenir au moins 1 majuscule"
-                ]
-            }"""
+                                    {
+                                        "code": "VALIDATION_ERROR",
+                                        "errors": [
+                                            "email : Doit être une adresse email valide",
+                                            "password : Le mot de passe doit contenir au moins 1 majuscule"
+                                        ]
+                                    }
+                                """
                             )
                     )
             ),
             @ApiResponse(
                     responseCode = "409",
-                    description = "Conflit - L'identifiant existe déjà",
+                    description = "Conflit - L'identifiant existe déjà dans la base de données",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = Response.class),
                             examples = @ExampleObject(
                                     value = """
-            {
-                "code": "USERNAME_EXISTS",
-                "message": "Ce nom d'utilisateur est déjà utilisé"
-            }"""
+                                    {
+                                        "code": "USERNAME_EXISTS",
+                                        "message": "Ce nom d'utilisateur est déjà utilisé"
+                                    }
+                                """
                             )
                     )
             )
@@ -121,45 +131,51 @@ public class AuthController {
 
     @Operation(
             summary = "Authentification utilisateur",
-            description = "Authentifie un utilisateur et retourne un token JWT valide pour les requêtes suivantes.",
+            description = """
+            Authentifie un utilisateur et retourne un token JWT valide pour les requêtes suivantes.
+            L'utilisateur doit fournir son nom d'utilisateur et son mot de passe pour obtenir un token d'authentification.
+        """,
             tags = {"Authentification"}
     )
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
-                    description = "Authentification réussie",
+                    description = "Authentification réussie - Le token JWT est renvoyé pour les requêtes suivantes",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = JwtResponse.class),
                             examples = @ExampleObject(
                                     value = """
-                {
-                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                    "type": "Bearer",
-                    "id": 1,
-                    "username": "john_doe",
-                    "email": "john@example.com",
-                    "role": "USER"
-                }"""
+                                    {
+                                        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                                        "type": "Bearer",
+                                        "id": 1,
+                                        "username": "john_doe",
+                                        "email": "john@example.com",
+                                        "role": "USER"
+                                    }
+                                """
                             )
                     )
             ),
             @ApiResponse(
                     responseCode = "401",
-                    description = "Non autorisé",
+                    description = "Non autorisé - Les informations d'authentification sont incorrectes",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = Response.class),
                             examples = @ExampleObject(
                                     value = """
-                {
-                    "code": "INVALID_CREDENTIALS",
-                    "message": "Nom d'utilisateur ou mot de passe incorrect"
-                }"""
+                                    {
+                                        "code": "INVALID_CREDENTIALS",
+                                        "message": "Nom d'utilisateur ou mot de passe incorrect"
+                                    }
+                                """
                             )
                     )
             )
     })
+
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         try {
@@ -190,19 +206,84 @@ public class AuthController {
 
 
 
-    //==================================== SIGNING METHOD
+    //==================================== UPDATE USER
 
     @Operation(
             operationId = "updateUserEndpoint", // ID unique explicite
             summary = "Mettre à jour le profil utilisateur",
-            description = "Met à jour les informations de l'utilisateur. Nécessite d'être ADMIN authentifié.",
+            description = """
+            Met à jour les informations de l'utilisateur. L'utilisateur doit être authentifié pour effectuer cette action.
+            L'endpoint permet de modifier les informations personnelles de l'utilisateur, telles que son nom, son email, etc.
+        """,
             security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Utilisateur mis à jour avec succès"),
-            @ApiResponse(responseCode = "400", description = "Entrée invalide"),
-            @ApiResponse(responseCode = "403", description = "Interdit"),
-            @ApiResponse(responseCode = "404", description = "Utilisateur non trouvé")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Utilisateur mis à jour avec succès",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserDTO.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                        "id": 1,
+                                        "username": "john_doe",
+                                        "email": "john_doe@example.com",
+                                        "roles": ["ROLE_USER"]
+                                    }
+                                """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Entrée invalide - La requête contient des données incorrectes",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Response.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                        "code": "INVALID_INPUT",
+                                        "message": "Les données envoyées sont invalides"
+                                    }
+                                """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Interdit - L'utilisateur n'a pas les permissions nécessaires pour effectuer cette action",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Response.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                        "code": "FORBIDDEN",
+                                        "message": "Accès interdit. Vous n'avez pas les permissions nécessaires."
+                                    }
+                                """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Utilisateur non trouvé - L'utilisateur spécifié n'existe pas",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Response.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                        "code": "USER_NOT_FOUND",
+                                        "message": "L'utilisateur n'a pas été trouvé"
+                                    }
+                                """
+                            )
+                    )
+            )
     })
     @PreAuthorize("#userId == authentication.principal.id or hasRole('ROLE_ADMIN')")
     @PutMapping("/update-user/{userId}")
