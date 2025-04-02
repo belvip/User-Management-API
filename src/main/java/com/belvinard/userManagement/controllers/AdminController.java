@@ -128,7 +128,7 @@ public class AdminController {
     })
     @PutMapping("/user/{userId}/role")
     public ResponseEntity<UserDTO> updateUserRole(@PathVariable Long userId, @RequestBody Map<String, String> request) {
-        String roleName = request.get("roleName"); // Récupère bien la valeur
+        String roleName = request.get("roleName");
         UserDTO updatedUser = userService.updateUserRole(userId, roleName);
         return ResponseEntity.ok(updatedUser);
     }

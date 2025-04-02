@@ -42,20 +42,19 @@ public class AuthController {
     private final UserRepository userRepository;
 
     @Operation(
-        summary = "Créer un nouvel utilisateur",
-        description = "Permet de créer un compte utilisateur avec un rôle spécifié (user ou admin)."
+            summary = "Créer un nouvel utilisateur",
+            description = "Permet de créer un compte utilisateur avec un rôle spécifié (user ou admin)."
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Utilisateur créé avec succès"),
-        @ApiResponse(responseCode = "400", description = "Erreur de validation des données"),
-        @ApiResponse(responseCode = "409", description = "Le nom d'utilisateur ou l'email existent déjà")
+            @ApiResponse(responseCode = "200", description = "Utilisateur créé avec succès"),
+            @ApiResponse(responseCode = "400", description = "Erreur de validation des données"),
+            @ApiResponse(responseCode = "409", description = "Le nom d'utilisateur ou l'email existent déjà")
     })
     @PostMapping("/signup")
-    public ResponseEntity<String> registerUser(
-            @Parameter(description = "Données de l'utilisateur à créer", required = true)
+    public ResponseEntity<UserDTO> registerUser(
             @Valid @RequestBody SignupRequest request) {
-        User user = authService.registerUser(request);
-        return ResponseEntity.ok("Utilisateur créé avec succès : " + user.getUserName());
+        UserDTO userDTO = authService.registerUser(request);
+        return ResponseEntity.ok(userDTO);
     }
 
 
@@ -104,17 +103,6 @@ public class AuthController {
         }
         return ResponseEntity.ok(userDetails);
     }
-
-//    @Operation(summary = "Met à jour un utilisateur",
-//          description = "Modifie les informations d'un utilisateur existant sans modifier son rôle.")
-//    @PutMapping("/update-user/{userId}")
-//    public ResponseEntity<UserDTO> updateUser(
-//            @PathVariable Long userId,
-//            @Valid @RequestBody UpdateUserRequest request) {  // Valide directement la Request
-//
-//        UserDTO updatedUser = authService.updateUser(userId, request); // Passe la request directement
-//        return ResponseEntity.ok(updatedUser);
-//    }
 
 
     @Operation(

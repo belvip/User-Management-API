@@ -21,13 +21,6 @@ public class JwtUtils {
     private int jwtExpirationMs;
 
 
-    //private final int jwtExpirationMs = 86400000; // 1 jour
-
-//    private SecretKey getSigningKey() {
-//        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret); // Convertit en bytes
-//        return Keys.hmacShaKeyFor(keyBytes); // Génère une clé compatible HS512
-//    }
-
     private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
         if (keyBytes.length < 64) {
