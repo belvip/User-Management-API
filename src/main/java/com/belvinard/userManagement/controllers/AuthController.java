@@ -2,6 +2,8 @@ package com.belvinard.userManagement.controllers;
 
 import com.belvinard.userManagement.dtos.*;
 import com.belvinard.userManagement.exceptions.APIException;
+import com.belvinard.userManagement.exceptions.CustomAccessDeniedException;
+import com.belvinard.userManagement.exceptions.CustomUsernameNotFoundException;
 import com.belvinard.userManagement.model.User;
 import com.belvinard.userManagement.repositories.UserRepository;
 import com.belvinard.userManagement.security.CustomUserDetails;
@@ -29,7 +31,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.AccessDeniedException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -91,27 +95,72 @@ public class AuthController {
     @PutMapping("/update-user/{userId}")
     public ResponseEntity<UserDTO> updateUser(
             @PathVariable Long userId,
-            @Valid @RequestBody UpdateUserRequest request) throws AccessDeniedException {
+            @Valid @RequestBody UpdateUserRequest request) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         Object principal = authentication.getPrincipal();
-        System.out.println("Class of principal: " + principal.getClass().getName());
 
         if (!(principal instanceof UserDetailsImpl)) {
-            throw new AccessDeniedException("Utilisateur non valide ou non authentifié");
+            throw new CustomAccessDeniedException("Utilisateur non valide ou non authentifié");
         }
 
         UserDetailsImpl userDetails = (UserDetailsImpl) principal;
 
-        // Changer getUserId() par getId()
         if (!userDetails.getId().equals(userId) && !userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
-            throw new AccessDeniedException("Vous n'avez pas l'autorisation de modifier cet utilisateur.");
+            throw new CustomAccessDeniedException("Vous n'avez pas l'autorisation de modifier cet utilisateur.");
         }
 
         UserDTO updatedUser = authService.updateUser(userId, request);
         return ResponseEntity.ok(updatedUser);
     }
+
+    @ExceptionHandler(CustomAccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleCustomAccessDeniedException(CustomAccessDeniedException ex) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("code", "ACCESS_DENIED");
+        errorResponse.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(errorResponse, ex.getStatus());
+    }
+
+    @ExceptionHandler(CustomUsernameNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleUserNotFoundException(CustomUsernameNotFoundException ex) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("code", "USER_NOT_FOUND");
+        errorResponse.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(errorResponse, ex.getStatus());
+    }
+
+
+
+
+//    @Operation(summary = "Met à jour les informations de l'utilisateur connecté et authentifié")
+//    @PreAuthorize("#userId == authentication.principal.id or hasRole('ROLE_ADMIN')")
+//    @PutMapping("/update-user/{userId}")
+//    public ResponseEntity<UserDTO> updateUser(
+//            @PathVariable Long userId,
+//            @Valid @RequestBody UpdateUserRequest request) throws AccessDeniedException {
+//
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//        Object principal = authentication.getPrincipal();
+//        System.out.println("Class of principal: " + principal.getClass().getName());
+//
+//        if (!(principal instanceof UserDetailsImpl)) {
+//            throw new AccessDeniedException("Utilisateur non valide ou non authentifié");
+//        }
+//
+//        UserDetailsImpl userDetails = (UserDetailsImpl) principal;
+//
+//        // Changer getUserId() par getId()
+//        if (!userDetails.getId().equals(userId) && !userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+//            throw new AccessDeniedException("Vous n'avez pas l'autorisation de modifier cet utilisateur.");
+//        }
+//
+//        UserDTO updatedUser = authService.updateUser(userId, request);
+//        return ResponseEntity.ok(updatedUser);
+//    }
 
 
     // Gérer l'exception directement dans le contrôleur

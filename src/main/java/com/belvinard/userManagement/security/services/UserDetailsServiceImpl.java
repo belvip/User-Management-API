@@ -1,5 +1,6 @@
 package com.belvinard.userManagement.security.services;
 
+import com.belvinard.userManagement.exceptions.CustomUsernameNotFoundException;
 import com.belvinard.userManagement.model.User;
 import com.belvinard.userManagement.repositories.UserRepository;
 import org.slf4j.Logger;
@@ -21,13 +22,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) throws CustomUsernameNotFoundException {
         logger.info("Loading user with username: {}", username);
 
         User user = userRepository.findByUserName(username)
                 .orElseThrow(() -> {
                     logger.error("User not found with username: {}", username);
-                    return new UsernameNotFoundException("User Not Found with username: " + username);
+                    return new CustomUsernameNotFoundException("Utilisateur introuvable avec le nom : " + username);
                 });
 
         logger.info("User found: {}", user.getUserName());
