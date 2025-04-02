@@ -20,7 +20,6 @@ public class JwtUtils {
     @Value("${spring.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
-
     private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
         if (keyBytes.length < 64) {
@@ -29,31 +28,30 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-
     public String generateJwtToken(Authentication authentication) {
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
 
         return Jwts.builder()
-                .subject(userPrincipal.getUsername())
+                .subject(userPrincipal.getEmail()) // CHANGER : Utiliser l'email au lieu du username
                 .issuedAt(new Date())
                 .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(getSigningKey(), Jwts.SIG.HS512) // Correction ici !
+                .signWith(getSigningKey(), Jwts.SIG.HS512)
                 .compact();
     }
 
-    public String getUserNameFromJwtToken(String token) {
+    public String getEmailFromJwtToken(String token) { // CHANGER LE NOM
         Claims claims = Jwts.parser()
-                .verifyWith(getSigningKey()) // Correction ici aussi !
+                .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-        return claims.getSubject();
+        return claims.getSubject(); // C'est maintenant l'email
     }
 
     public boolean validateJwtToken(String authToken) {
         try {
             Jwts.parser()
-                    .verifyWith(getSigningKey()) // Correction ici aussi !
+                    .verifyWith(getSigningKey())
                     .build()
                     .parseSignedClaims(authToken);
             return true;

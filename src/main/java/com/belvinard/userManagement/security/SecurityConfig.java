@@ -42,6 +42,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/public/**").permitAll()
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/auth/signin").permitAll()
                         // Public endpoints
                         .requestMatchers(
                                 "/api/auth/public/**",
@@ -100,7 +101,7 @@ public class SecurityConfig {
 
             if (!userRepository.existsByUserName("admin")) {
                 User admin = new User("admin", "admin@example.com",
-                        passwordEncoder.encode("adminPass"));
+                        passwordEncoder.encode("P@ssword123"));
                 admin.setAccountNonLocked(true);
                 admin.setAccountNonExpired(true);
                 admin.setCredentialsNonExpired(true);
