@@ -1,6 +1,7 @@
 package com.belvinard.userManagement.controllers;
 
 import com.belvinard.userManagement.dtos.*;
+import com.belvinard.userManagement.exceptions.APIException;
 import com.belvinard.userManagement.exceptions.CustomAccessDeniedException;
 import com.belvinard.userManagement.exceptions.CustomUsernameNotFoundException;
 import com.belvinard.userManagement.model.User;
@@ -150,8 +151,8 @@ public class AuthController {
                                         "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
                                         "type": "Bearer",
                                         "id": 1,
-                                        "username": "john_doe",
-                                        "email": "john@example.com",
+                                        "username": "user1",
+                                        "email": "user1@example.com",
                                         "role": "USER"
                                     }
                                 """
@@ -228,8 +229,8 @@ public class AuthController {
                                     value = """
                                     {
                                         "id": 1,
-                                        "username": "john_doe",
-                                        "email": "john_doe@example.com",
+                                        "username": "user1",
+                                        "email": "user1@example.com",
                                         "roles": ["ROLE_USER"]
                                     }
                                 """
@@ -341,5 +342,14 @@ public class AuthController {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    // Gestion de l'exception ResourceNotFoundException
+    @ExceptionHandler(APIException.class)
+    public ResponseEntity<Response> myAPIException(APIException ex) {
+        // Créer l'instance d'ErrorResponse
+        Response errorResponse = new Response("BAD_REQUEST", ex.getMessage());
+
+        // Retourner la réponse avec le code HTTP 404
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
 
 }

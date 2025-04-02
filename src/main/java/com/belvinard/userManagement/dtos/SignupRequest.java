@@ -20,7 +20,7 @@ public class SignupRequest {
     @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "Le nom d'utilisateur ne peut contenir que des lettres, chiffres et underscores")
     @Schema(
             description = "Nom d'utilisateur unique",
-            example = "john_doe",
+            example = "admin",
             minLength = 3,
             maxLength = 20,
             requiredMode = Schema.RequiredMode.REQUIRED
