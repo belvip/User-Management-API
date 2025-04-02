@@ -4,30 +4,31 @@ import com.belvinard.userManagement.dtos.*;
 import com.belvinard.userManagement.exceptions.APIException;
 import com.belvinard.userManagement.model.User;
 import com.belvinard.userManagement.repositories.UserRepository;
+import com.belvinard.userManagement.security.CustomUserDetails;
 import com.belvinard.userManagement.security.jwt.JwtUtils;
 import com.belvinard.userManagement.security.request.LoginRequest;
 import com.belvinard.userManagement.security.response.JwtResponse;
 import com.belvinard.userManagement.security.services.UserDetailsImpl;
 import com.belvinard.userManagement.services.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -85,47 +86,35 @@ public class AuthController {
         ));
     }
 
-    // Gestion de l'exception ResourceNotFoundException
-    @ExceptionHandler(APIException.class)
-    public ResponseEntity<Response> myAPIException(APIException ex) {
-        // Créer l'instance d'ErrorResponse
-        Response errorResponse = new Response("BAD_REQUEST", ex.getMessage());
-
-        // Retourner la réponse avec le code HTTP 404
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
-
-    @Operation(summary = "Récupérer les détails de l'utilisateur connecté", security = @SecurityRequirement(name = "BearerAuth"))
-    @GetMapping("/user")
-    public ResponseEntity<?> getUserDetails(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        if (userDetails == null) {
-            return ResponseEntity.status(401).body("Utilisateur non authentifié");
-        }
-        return ResponseEntity.ok(userDetails);
-    }
-
-
-    @Operation(
-            summary = "Met à jour un utilisateur",
-            description = "Modifie les informations d'un utilisateur existant sans modifier son rôle."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Utilisateur mis à jour avec succès"),
-            @ApiResponse(responseCode = "400", description = "Requête invalide ou données de mise à jour incorrectes"),
-            @ApiResponse(responseCode = "404", description = "Utilisateur non trouvé"),
-            @ApiResponse(responseCode = "500", description = "Erreur interne du serveur")
-    })
+    @Operation(summary = "Met à jour les informations de l'utilisateur connecté et authentifié")
+    @PreAuthorize("#userId == authentication.principal.id or hasRole('ROLE_ADMIN')")
     @PutMapping("/update-user/{userId}")
     public ResponseEntity<UserDTO> updateUser(
             @PathVariable Long userId,
-            @Valid @RequestBody UpdateUserRequest request) {
+            @Valid @RequestBody UpdateUserRequest request) throws AccessDeniedException {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        Object principal = authentication.getPrincipal();
+        System.out.println("Class of principal: " + principal.getClass().getName());
+
+        if (!(principal instanceof UserDetailsImpl)) {
+            throw new AccessDeniedException("Utilisateur non valide ou non authentifié");
+        }
+
+        UserDetailsImpl userDetails = (UserDetailsImpl) principal;
+
+        // Changer getUserId() par getId()
+        if (!userDetails.getId().equals(userId) && !userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+            throw new AccessDeniedException("Vous n'avez pas l'autorisation de modifier cet utilisateur.");
+        }
 
         UserDTO updatedUser = authService.updateUser(userId, request);
         return ResponseEntity.ok(updatedUser);
     }
 
 
-    // ✅ Gérer l'exception directement dans le contrôleur
+    // Gérer l'exception directement dans le contrôleur
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
         List<String> errors = ex.getBindingResult()

@@ -25,23 +25,5 @@ public class HelloController {
         return "Hello UserManagement";
     }
 
-//    @Operation(
-//            summary = "Get user greeting",
-//            description = "Returns a personalized greeting for users",
-//            responses = {
-//                    @ApiResponse(
-//                            responseCode = "200",
-//                            description = "Successfully returned user greeting"
-//                    ),
-//                    @ApiResponse(
-//                            responseCode = "401",
-//                            description = "Unauthorized - authentication required"
-//                    )
-//            }
-//    )
-//    @GetMapping("/user")
-//    public String user() {
-//        return "Hello User";
-//    }
 
 }
