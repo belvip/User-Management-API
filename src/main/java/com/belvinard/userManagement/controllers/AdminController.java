@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -425,9 +426,9 @@ public class AdminController {
     @PutMapping("/user/{userId}/role")
     public ResponseEntity<UserDTO> updateUserRole(
             @PathVariable Long userId,
-            @RequestBody Map<String, String> request
+            @Valid @RequestBody RoleUpdateDTO roleUpdateDTO
     ) {
-        String roleName = request.get("roleName");
+        String roleName = roleUpdateDTO.getRoleName();
         UserDTO updatedUser = userService.updateUserRole(userId, roleName);
         return ResponseEntity.ok(updatedUser);
     }
