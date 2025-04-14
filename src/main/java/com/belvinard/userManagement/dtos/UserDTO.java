@@ -1,6 +1,7 @@
 package com.belvinard.userManagement.dtos;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -16,6 +17,7 @@ public class UserDTO {
     private Long userId;
 
     @NotBlank
+    @JsonProperty("username")
     @Size(max = 20)
     private String userName;
     @NotBlank

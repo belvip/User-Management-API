@@ -211,7 +211,7 @@ public class AuthController {
 
     @Operation(
             operationId = "updateUserEndpoint", // ID unique explicite
-            summary = "Mettre à jour le profil utilisateur",
+            summary = "L'utilisateur authentifié peut mettre à jour son profil ",
             description = """
             Met à jour les informations de l'utilisateur. L'utilisateur doit être authentifié pour effectuer cette action.
             L'endpoint permet de modifier les informations personnelles de l'utilisateur, telles que son nom, son email, etc.

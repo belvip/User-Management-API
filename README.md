@@ -7,7 +7,8 @@ Ce projet implémente une API de gestion des utilisateurs avec des fonctionnalit
 Avant de commencer, assurez-vous que vous avez installé les éléments suivants sur votre machine :
 
 - **Java 21 ou supérieur** - pour compiler et exécuter l'application.
-- **Maven** - pour gérer les dépendances et construire le projet.
+- **Maven** -
+- pour gérer les dépendances et construire le projet.
 - **Base de données** - Postgres ou autre base de données relationnelle configurée pour l'application.
 
 ## Lancer l'API
@@ -47,7 +48,7 @@ mvn spring-boot:run
 Cela démarrera l'API sur le port par défaut `8083`. Vous pouvez le modifier dans le fichier `application.properties` :
 
 ```properties
-server.port=8080
+server.port=8083
 ```
 
 ## Étape 4 : Vérifier que l'API fonctionne

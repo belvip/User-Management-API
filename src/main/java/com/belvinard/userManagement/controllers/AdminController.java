@@ -1,10 +1,7 @@
 package com.belvinard.userManagement.controllers;
 
 
-import com.belvinard.userManagement.dtos.Response;
-import com.belvinard.userManagement.dtos.UserDTO;
-import com.belvinard.userManagement.dtos.UserResponse;
-import com.belvinard.userManagement.dtos.UserRoleDTO;
+import com.belvinard.userManagement.dtos.*;
 import com.belvinard.userManagement.exceptions.APIException;
 import com.belvinard.userManagement.exceptions.ResourceNotFoundException;
 import com.belvinard.userManagement.repositories.RoleRepository;
@@ -21,11 +18,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin")
